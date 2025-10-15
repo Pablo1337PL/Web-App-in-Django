@@ -1,0 +1,67 @@
+{% extends 'core/base.html' %}
+{% block title %}Edit Course{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Edit Course</h2>
+  <form method="post" class="mt-3">
+    {% csrf_token %}
+
+    <div class="mb-3">
+      <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
+      {{ form.name }}
+      {% if form.name.errors %}
+        <div class="text-danger">{{ form.name.errors }}</div>
+      {% endif %}
+    </div>
+
+    <div class="mb-3">
+      <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+      {{ form.description }}
+      {% if form.description.errors %}
+        <div class="text-danger">{{ form.description.errors }}</div>
+      {% endif %}
+    </div>
+
+    <div class="mb-3">
+      <label for="{{ form.level.id_for_label }}" class="form-label">{{ form.level.label }}</label>
+      {{ form.level }}
+      {% if form.level.errors %}
+        <div class="text-danger">{{ form.level.errors }}</div>
+      {% endif %}
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">{{ form.programming_languages.label }}</label>
+      <div class="row">
+        {% for checkbox in form.programming_languages %}
+          <div class="col-md-4 mb-2">
+            {{ checkbox }}
+          </div>
+        {% endfor %}
+      </div>
+      {% if form.programming_languages.help_text %}
+        <div class="form-text">{{ form.programming_languages.help_text }}</div>
+      {% endif %}
+      {% if form.programming_languages.errors %}
+        <div class="text-danger">{{ form.programming_languages.errors }}</div>
+      {% endif %}
+    </div>
+
+    <button type="submit" class="btn btn-success">Update Course</button>
+    <a href="{% url 'core:courses_list' %}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+
+<style>
+  input[type="text"], textarea, select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  textarea {
+    min-height: 100px;
+  }
+</style>
+{% endblock %}

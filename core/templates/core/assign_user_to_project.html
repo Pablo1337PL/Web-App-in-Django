@@ -1,0 +1,53 @@
+{% extends 'core/base.html' %}
+{% block title %}Assign User to Project{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Assign {{ user.username }} to Project</h2>
+
+<div class="mb-3">
+  <a href="{% url 'core:admin_manage_users' %}" class="btn btn-secondary">← Back to Users</a>
+</div>
+
+<div class="mb-3">
+  <form method="get" class="d-flex">
+    <input type="text" name="q" class="form-control me-2" placeholder="Search projects by name" value="{{ search_query }}">
+    <button type="submit" class="btn btn-primary">Search</button>
+    {% if search_query %}
+      <a href="{% url 'core:assign_user_to_project' user.id %}" class="btn btn-outline-secondary ms-2">Clear</a>
+    {% endif %}
+  </form>
+</div>
+
+<table class="table table-bordered table-hover">
+  <thead class="table-dark">
+    <tr>
+      <th>Project Name</th>
+      <th>Description</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for project in projects %}
+    <tr {% if project.id in assigned_project_ids %}class="table-success"{% endif %}>
+      <td>{{ project.name }}</td>
+      <td>{{ project.description|truncatewords:20 }}</td>
+      <td>
+        {% if project.id in assigned_project_ids %}
+          <span class="badge bg-success">Already Assigned</span>
+        {% else %}
+          <form method="post" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="project_id" value="{{ project.id }}">
+            <button type="submit" class="btn btn-sm btn-primary">Assign</button>
+          </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="3" class="text-center text-muted">No projects found</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

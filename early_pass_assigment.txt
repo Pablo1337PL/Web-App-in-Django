@@ -1,0 +1,22 @@
+Early Pass project requirements
+
+Application
+
+- allow users login and password reset
+- there are at least 3 roles (eg, a normal user, manager and backend admin roles)
+- the application allows only the logged-in user to access restricted resources
+- at least 2 tables with items browsable by the regular user, which can be filtered 
+- the application is aesthetically pleasing 
+- the application is responsive (i.e. adapted to at least two resolutions - e.g. computer and tablet or computer and smartphone)
+- all forms data is validated
+- the application allows you to save or modify records
+- use of AJAX technology or similar technique
+- The application follow good programming practices
+- Git repo source code available
+- Application easily deployed on other computers (Docker prefferd) or web hosted
+- Unit test, integration test, Automatic tests (at least 70% cover)
+- short report with idea outline, dataflow and main views screenshots
+
+
+
+

@@ -1,0 +1,66 @@
+{% extends 'core/base.html' %}
+{% block title %}Manage Users{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">Manage Users</h2>
+
+<table class="table table-bordered table-hover">
+  <thead class="table-dark">
+    <tr>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Role</th>
+      <th>Projects</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user_profile in user_profiles %}
+    <tr>
+      <td>{{ user_profile.user.username }}</td>
+      <td>{{ user_profile.user.email|default:"No email" }}</td>
+      <td>
+        {% if user_profile.user.is_superuser %}
+          <span class="badge bg-danger">Admin</span>
+        {% elif user_profile.user.is_staff %}
+          <span class="badge bg-warning text-dark">Staff</span>
+        {% else %}
+          <span class="badge bg-secondary">User</span>
+        {% endif %}
+      </td>
+      <td>
+        {% for assignment in user_profile.user.assignment_set.all %}
+          {{ assignment.project.name }}{% if not forloop.last %}, {% endif %}
+        {% empty %}
+          <span class="text-muted">No projects</span>
+        {% endfor %}
+      </td>
+      <td>
+        {% if user.is_superuser and user_profile.user.id != user.id %}
+          <form method="post" action="{% url 'core:change_user_role' user_profile.user.id %}" class="d-inline">
+            {% csrf_token %}
+            <select name="role" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
+              <option value="">Change Role...</option>
+              <option value="user" {% if not user_profile.user.is_staff %}selected{% endif %}>User</option>
+              <option value="staff" {% if user_profile.user.is_staff and not user_profile.user.is_superuser %}selected{% endif %}>Staff</option>
+              <option value="admin" {% if user_profile.user.is_superuser %}selected{% endif %}>Admin</option>
+            </select>
+          </form>
+        {% endif %}
+
+        {% if user.is_staff %}
+          <a href="{% url 'core:assign_user_to_project' user_profile.user.id %}" class="btn btn-sm btn-success">Assign to Project</a>
+        {% endif %}
+
+        {% if user.is_superuser and not user_profile.user.is_superuser and user_profile.user.id != user.id %}
+          <form method="post" action="{% url 'core:delete_user' user_profile.user.id %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this user?')">Delete</button>
+          </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

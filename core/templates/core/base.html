@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Data Science Club{% endblock %}</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<script src="/static/js/main.js" defer></script>
+<style>
+  .sidebar {
+    min-height: calc(100vh - 56px);
+    background-color: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+    padding-top: 20px;
+  }
+  .sidebar .nav-link {
+    color: #333;
+    padding: 10px 20px;
+    margin-bottom: 5px;
+  }
+  .sidebar .nav-link:hover {
+    background-color: #e9ecef;
+    border-radius: 5px;
+  }
+  .sidebar .nav-link.active {
+    background-color: #0d6efd;
+    color: white;
+    border-radius: 5px;
+  }
+  .sidebar .nav-link i {
+    margin-right: 10px;
+  }
+  .main-content {
+    padding: 20px;
+  }
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'core:datasciencepage' %}">DataScienceClub</a>
+    <a class="navbar-brand" href="{% url 'core:home' %}">HOME</a>
+
+    <div class="d-flex align-items-center ms-auto">
+      {% if user.is_authenticated %}
+        <span class="text-light me-3">{{ user.username }}</span>
+        <form action="{% url 'core:logout' %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-sm btn-outline-light">Logout</button>
+        </form>
+      {% else %}
+        <a class="btn btn-sm btn-outline-light" href="{% url 'core:login' %}">Login</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<div class="{% if user.is_authenticated %}container-fluid{% else %}container mt-4{% endif %}">
+  {% if user.is_authenticated %}
+  <div class="row">
+    <nav class="col-md-2 col-lg-2 d-md-block sidebar">
+      <div class="position-sticky">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'core:home' %}">
+              <i class="bi bi-house-door"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'core:project_list' %}">
+              <i class="bi bi-folder"></i> View Projects
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'core:courses_list' %}">
+              <i class="bi bi-book"></i> Courses
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'core:profile_edit' %}">
+              <i class="bi bi-person-circle"></i> Edit Profile
+            </a>
+          </li>
+
+          {% if user.is_staff %}
+          <hr class="text-muted">
+          <li class="nav-item">
+            <small class="text-muted px-3">STAFF</small>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'core:add_course' %}">
+              <i class="bi bi-plus-circle"></i> Add Course
+            </a>
+          </li>
+          {% endif %}
+
+          {% if user.is_superuser %}
+          <hr class="text-muted">
+          <li class="nav-item">
+            <small class="text-muted px-3">ADMIN</small>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'core:add_project' %}">
+              <i class="bi bi-plus-circle"></i> Add Project
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'core:admin_manage_users' %}">
+              <i class="bi bi-people"></i> Manage Users
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </nav>
+
+    <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4 main-content">
+  {% endif %}
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {% block content %}{% endblock %}
+
+  {% if user.is_authenticated %}
+    </main>
+  </div>
+  {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

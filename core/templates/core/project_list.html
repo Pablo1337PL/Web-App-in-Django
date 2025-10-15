@@ -1,0 +1,54 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Projects{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Projects</h2>
+
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <input type="text" id="q" class="form-control" placeholder="Search projects by name or description">
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <label class="form-label fw-bold">Filter by Categories:</label>
+            <div class="d-flex flex-wrap gap-3">
+                {% for category in all_categories %}
+                    <div class="form-check">
+                        <input class="form-check-input category-checkbox" type="checkbox" value="{{ category.id }}" id="category{{ category.id }}">
+                        <label class="form-check-label" for="category{{ category.id }}">
+                            {{ category.name }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+      <table class="table table-striped" id="projectsTable">
+        <thead>
+            <tr>
+                <th class="sortable" data-column="name">Name</th>
+                <th class="sortable" data-column="description">Description</th>
+                <th class="sortable" data-column="categories">Categories</th>
+                <th class="sortable" data-column="mentors">Mentors</th>
+                <th class="sortable" data-column="participants">Participants</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Rows will be populated dynamically -->
+        </tbody>
+      </table>
+</div>
+
+<script src="{% static 'js/main.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    fetchProjects(); // only runs after DOM is ready
+});
+</script>
+{% endblock %}

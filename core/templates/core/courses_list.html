@@ -1,0 +1,72 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Courses{% endblock %}
+
+{% block content %}
+<style>
+    .bg-purple {
+        background-color: #6f42c1 !important;
+    }
+</style>
+<div class="container mt-4">
+    <h2>Courses</h2>
+
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <input type="text" id="q" class="form-control" placeholder="Search courses by name or description">
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <label class="form-label fw-bold">Filter by Programming Languages:</label>
+            <div class="d-flex flex-wrap gap-3">
+                {% for language in all_languages %}
+                    <div class="form-check">
+                        <input class="form-check-input language-checkbox" type="checkbox" value="{{ language.id }}" id="language{{ language.id }}">
+                        <label class="form-check-label" for="language{{ language.id }}">
+                            {{ language.name }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <label class="form-label fw-bold">Filter by Level:</label>
+            <select id="levelFilter" class="form-select" style="max-width: 300px;">
+                <option value="">All Levels</option>
+                <option value="1">Beginner</option>
+                <option value="2">Elementary</option>
+                <option value="3">Intermediate</option>
+                <option value="4">Advanced</option>
+                <option value="5">Expert</option>
+            </select>
+        </div>
+    </div>
+
+    <table class="table table-striped" id="coursesTable">
+        <thead>
+            <tr>
+                <th class="sortable" data-column="name">Name</th>
+                <th class="sortable" data-column="description">Description</th>
+                <th class="sortable" data-column="level">Level</th>
+                <th class="sortable" data-column="programming_languages">Programming Languages</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Rows will be populated dynamically -->
+        </tbody>
+    </table>
+</div>
+
+<script src="{% static 'js/courses.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    fetchCourses(); // only runs after DOM is ready
+});
+</script>
+{% endblock %}
