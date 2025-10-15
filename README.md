@@ -31,11 +31,21 @@ A Django web application for managing Data Science Club projects and courses wit
 - Python (tested version 3.13.0)
 - Django (tested version 5.2)
 
-## Initial Setup
+## Quick Start with Docker
 
-### Quick Setup (Recommended)
+### Step 1: Start the application
 
-Use the cross-platform initialization script:
+```bash
+# Build and start containers
+docker-compose up --build
+
+# Or run in background (detached mode)
+docker-compose up -d --build
+```
+
+The application will be available at http://localhost:8000 (but database is empty, you can still register users though)
+
+### Step 2: Initialize database (in another terminal: in case of no '-d' option)
 
 ```bash
 # Works on Windows, Linux, and macOS
@@ -48,15 +58,6 @@ This will automatically:
 - Create courses and programming languages
 - Generate test users and projects
 - User credentials will be saved in test_users_credentials.txt
-
-## Quick Start with Docker
-
-```bash
-# Build and run
-docker-compose up --build
-
-# Access at http://localhost:8000
-```
 
 ## Default Test Accounts
 
