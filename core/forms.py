@@ -36,6 +36,12 @@ class ProjectForm(forms.ModelForm):
         model = Project
         fields = ['name', 'description', 'categories']
 
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        if ',' in name:
+            raise forms.ValidationError("Project name cannot contain commas.")
+        return name
+
 
 class CourseForm(forms.ModelForm):
     programming_languages = forms.ModelMultipleChoiceField(

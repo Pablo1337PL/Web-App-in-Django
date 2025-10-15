@@ -25,14 +25,14 @@ class Category(models.Model):
 
 
 class Project(models.Model):
-    name = models.CharField(max_length=255, null=True, blank=True)
+    name = models.CharField(max_length=255)
     description = models.TextField()
     categories = models.ManyToManyField(Category, blank=True, related_name='projects')
     mentors = models.ManyToManyField(User, blank=True, related_name='mentored_projects', limit_choices_to={'is_staff': True})
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.name or "Unnamed Project"
+        return self.name
 
 
 class Assignment(models.Model):

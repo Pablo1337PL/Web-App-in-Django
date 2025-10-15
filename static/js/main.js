@@ -179,6 +179,7 @@ function renderProjects(projects) {
                     method: 'POST',
                     headers: {
                         'X-CSRFToken': csrftoken,
+                        'x-requested-with': 'XMLHttpRequest',
                     },
                 });
 
@@ -201,6 +202,7 @@ function renderProjects(projects) {
                     method: 'POST',
                     headers: {
                         'X-CSRFToken': csrftoken,
+                        'x-requested-with': 'XMLHttpRequest',
                     },
                 });
 
