@@ -88,10 +88,7 @@ function renderProjects(projects) {
         if (p.is_admin) {
             actionsHTML += `
                 <a href="/staff/projects/edit/${p.id}/" class="btn btn-sm btn-warning">Edit</a>
-                <form action="/staff/projects/delete/${p.id}/" method="post" style="display:inline;">
-                    <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}">
-                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                </form>
+                <button class="btn btn-sm btn-danger delete-project-btn" data-id="${p.id}">Delete</button>
             `;
         }
 
@@ -260,6 +257,27 @@ function renderProjects(projects) {
                 fetchProjects();
             } else {
                 alert(result.message || 'Failed to stop mentoring');
+            }
+        });
+    });
+
+    // Add event listeners to delete project buttons (admin only)
+    document.querySelectorAll('.delete-project-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const projectId = btn.dataset.id;
+            const deleteResp = await fetch(`/staff/projects/delete/${projectId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+
+            const result = await deleteResp.json();
+            if (result.success) {
+                fetchProjects();
+            } else {
+                alert(result.message || 'Failed to delete project');
             }
         });
     });

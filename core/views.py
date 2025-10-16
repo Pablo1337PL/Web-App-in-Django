@@ -404,7 +404,15 @@ def edit_project(request, project_id):
 def delete_project(request, project_id):
     project = get_object_or_404(Project, id=project_id)
     if request.method == "POST":
+        project_name = project.name
         project.delete()
+
+        # Check for AJAX request
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+        if is_ajax:
+            return JsonResponse({"success": True, "message": f"Project '{project_name}' deleted."})
+
         messages.success(request, "Project deleted.")
         return redirect("core:project_list")
     return redirect("core:project_list")
