@@ -228,7 +228,8 @@ class ProjectFormTest(TestCase):
             'description': 'Description only'
         }
         form = ProjectForm(data=form_data)
-        self.assertTrue(form.is_valid())  # Name is nullable
+        self.assertFalse(form.is_valid())  # Name is required
+        self.assertIn('name', form.errors)
 
 
 class CourseFormTest(TestCase):
@@ -697,12 +698,12 @@ class URLTest(TestCase):
     def test_url_add_project(self):
         """Test add project URL resolves correctly"""
         url = reverse('core:add_project')
-        self.assertEqual(url, '/staff/projects/add/')
+        self.assertEqual(url, '/admin/projects/add/')
 
     def test_url_edit_project(self):
         """Test edit project URL resolves correctly"""
         url = reverse('core:edit_project', args=[self.project.id])
-        self.assertEqual(url, f'/staff/projects/edit/{self.project.id}/')
+        self.assertEqual(url, f'/admin/projects/edit/{self.project.id}/')
 
     def test_url_add_course(self):
         """Test add course URL resolves correctly"""
