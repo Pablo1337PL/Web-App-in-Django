@@ -90,7 +90,7 @@ function renderProjects(projects) {
                 <a href="/staff/projects/edit/${p.id}/" class="btn btn-sm btn-warning">Edit</a>
                 <form action="/staff/projects/delete/${p.id}/" method="post" style="display:inline;">
                     <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}">
-                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this project?')">Delete</button>
+                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                 </form>
             `;
         }
@@ -141,10 +141,10 @@ function renderProjects(projects) {
 
             const result = await applyResp.json();
             if (result.success) {
-                alert('Application submitted successfully!');
+            //     alert('Application submitted successfully!');
                 fetchProjects();
-            } else {
-                alert(result.message || 'Failed to apply');
+            // } else {
+            //     alert(result.message || 'Failed to apply');
             }
         });
     });
@@ -174,21 +174,19 @@ function renderProjects(projects) {
     document.querySelectorAll('.reject-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
             const applicationId = btn.dataset.id;
-            if (confirm('Reject this application?')) {
-                const rejectResp = await fetch(`/projects/reject/${applicationId}/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': csrftoken,
-                        'x-requested-with': 'XMLHttpRequest',
-                    },
-                });
+            const rejectResp = await fetch(`/projects/reject/${applicationId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
 
-                const result = await rejectResp.json();
-                if (result.success) {
-                    fetchProjects();
-                } else {
-                    alert(result.message || 'Failed to reject application');
-                }
+            const result = await rejectResp.json();
+            if (result.success) {
+                fetchProjects();
+            } else {
+                alert(result.message || 'Failed to reject application');
             }
         });
     });
@@ -197,21 +195,29 @@ function renderProjects(projects) {
     document.querySelectorAll('.remove-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
             const assignmentId = btn.dataset.id;
-            if (confirm('Remove this user from the project?')) {
+            try {
                 const removeResp = await fetch(`/projects/remove/${assignmentId}/`, {
                     method: 'POST',
                     headers: {
                         'X-CSRFToken': csrftoken,
-                        'x-requested-with': 'XMLHttpRequest',
+                        'X-Requested-With': 'XMLHttpRequest',
                     },
                 });
 
-                const result = await removeResp.json();
-                if (result.success) {
-                    fetchProjects();
+                if (removeResp.ok) {
+                    const result = await removeResp.json();
+                    if (result.success) {
+                        fetchProjects();
+                    } else {
+                        alert(result.message || 'Failed to remove user');
+                    }
                 } else {
-                    alert(result.message || 'Failed to remove user');
+                    console.error('Remove failed:', removeResp.status);
+                    fetchProjects(); // Refresh anyway since user was likely removed
                 }
+            } catch (error) {
+                console.error('Error removing user:', error);
+                fetchProjects(); // Refresh anyway
             }
         });
     });

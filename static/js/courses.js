@@ -83,7 +83,7 @@ function renderCourses(courses) {
                 <a href="/staff/courses/edit/${c.id}/" class="btn btn-sm btn-warning">Edit</a>
                 <form action="/staff/courses/delete/${c.id}/" method="post" style="display:inline;">
                     <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}">
-                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this course?')">Delete</button>
+                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                 </form>
             `;
         }

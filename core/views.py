@@ -347,6 +347,7 @@ def reject_application(request, application_id):
 
 @login_required
 @user_passes_test(is_staff_user)
+@require_POST
 def remove_user_from_project(request, assignment_id):
     """Staff removes an assigned user from project"""
     assignment = get_object_or_404(Assignment, id=assignment_id)
@@ -359,10 +360,13 @@ def remove_user_from_project(request, assignment_id):
     # Also delete the application so user can apply again
     Application.objects.filter(user=user, project=project).delete()
 
-    messages.success(request, f"{user.username} has been removed from {project.name}")
+    # Check for AJAX request (Django converts header names to lowercase with underscores)
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
 
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        return JsonResponse({"success": True, "message": "User removed from project"})
+    if is_ajax:
+        return JsonResponse({"success": True, "message": f"{user.username} removed from {project.name}"})
+
+    messages.success(request, f"{user.username} has been removed from {project.name}")
     return redirect('core:project_list')
 
 
