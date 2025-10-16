@@ -31,14 +31,32 @@ def main():
         print("Please install Docker and Docker Compose first")
         sys.exit(1)
 
+    # Run reset_migrations script
+    print("Resetting migrations...\n")
+    try:
+        result = subprocess.run(
+            [sys.executable, "reset_migrations.py"],
+            input="yes\n",
+            text=True,
+            check=True,
+            capture_output=True
+        )
+        print(result.stdout)
+    except subprocess.CalledProcessError as e:
+        print(f"Error running reset_migrations: {e.stderr}")
+        sys.exit(1)
+
+    print("\n" + "=" * 60)
+    print("Migrations reset complete. Initializing data...")
+    print("=" * 60 + "\n")
+
     commands = [
-        ("Running migrations", "docker-compose exec web python manage.py migrate"),
         ("Creating categories", "docker-compose exec web python manage.py create_categories"),
         ("Creating courses and programming languages", "docker-compose exec web python manage.py create_courses"),
         ("Generating test data", "docker-compose exec web python manage.py generate_test_data"),
     ]
 
-    print("Starting initialization...\n")
+    print("Starting data initialization...\n")
 
     for description, command in commands:
         print(f"{description}...")
