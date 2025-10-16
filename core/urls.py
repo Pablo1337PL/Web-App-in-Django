@@ -38,12 +38,12 @@ urlpatterns = [
     path('projects/unmentor/<int:project_id>/', views.unmentor_project, name='unmentor_project'),
 
     # Admin routes
-    path('staff/projects/add/', views.add_project, name='add_project'),
-    path('staff/projects/edit/<int:project_id>/', views.edit_project, name='edit_project'),
-    path('staff/projects/delete/<int:project_id>/', views.delete_project, name='delete_project'),
-    path('staff/users/', views.admin_manage_users, name='admin_manage_users'),
-    path('staff/users/assign/<int:user_id>/', views.assign_user_to_project, name='assign_user_to_project'),
-    path('staff/users/delete/<int:user_id>/', views.delete_user, name='delete_user'),
-    path('staff/users/change-role/<int:user_id>/', views.change_user_role, name='change_user_role'),
+    path('admin/projects/add/', views.add_project, name='add_project'),
+    path('admin/projects/edit/<int:project_id>/', views.edit_project, name='edit_project'),
+    path('admin/projects/delete/<int:project_id>/', views.delete_project, name='delete_project'),
+    path('admin/users/', views.admin_manage_users, name='admin_manage_users'),
+    path('admin/users/assign/<int:user_id>/', views.assign_user_to_project, name='assign_user_to_project'),
+    path('admin/users/delete/<int:user_id>/', views.delete_user, name='delete_user'),
+    path('admin/users/change-role/<int:user_id>/', views.change_user_role, name='change_user_role'),
 ]
 

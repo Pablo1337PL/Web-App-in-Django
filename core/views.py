@@ -112,10 +112,6 @@ def profile_edit(request):
     return render(request, 'core/profile_edit.html', context)
 
 
-def is_admin(user):
-    return user.is_superuser
-
-
 def is_staff_user(user):
     return user.is_staff or user.is_superuser
 
@@ -257,7 +253,7 @@ def add_course(request):
         form = CourseForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Course added successfully.")
+#            messages.success(request, "Course added successfully.")
             return redirect("core:courses_list")
     else:
         form = CourseForm()
@@ -272,7 +268,7 @@ def edit_course(request, course_id):
         form = CourseForm(request.POST, instance=course)
         if form.is_valid():
             form.save()
-            messages.success(request, "Course updated successfully.")
+#            messages.success(request, "Course updated successfully.")
             return redirect("core:courses_list")
     else:
         form = CourseForm(instance=course)
@@ -284,8 +280,15 @@ def edit_course(request, course_id):
 def delete_course(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     if request.method == "POST":
+        course_name = course.name
         course.delete()
-        messages.success(request, "Course deleted successfully.")
+
+        # Check for AJAX request
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+        if is_ajax:
+            return JsonResponse({"success": True, "message": f"Course '{course_name}' deleted."})
+
         return redirect("core:courses_list")
     return redirect("core:courses_list")
 
@@ -322,7 +325,7 @@ def accept_application(request, application_id):
 
         # Create assignment
         Assignment.objects.get_or_create(user=application.user, project=application.project)
-        messages.success(request, f"{application.user.username} has been accepted to {application.project.name}")
+        #messages.success(request, f"{application.user.username} has been accepted to {application.project.name}")
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({"success": True, "message": "Application accepted"})
@@ -338,7 +341,7 @@ def reject_application(request, application_id):
     if application.status == 'pending':
         application.status = 'rejected'
         application.save()
-        messages.success(request, f"Application from {application.user.username} has been rejected")
+        #messages.success(request, f"Application from {application.user.username} has been rejected")
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({"success": True, "message": "Application rejected"})
@@ -366,7 +369,7 @@ def remove_user_from_project(request, assignment_id):
     if is_ajax:
         return JsonResponse({"success": True, "message": f"{user.username} removed from {project.name}"})
 
-    messages.success(request, f"{user.username} has been removed from {project.name}")
+    #messages.success(request, f"{user.username} has been removed from {project.name}")
     return redirect('core:project_list')
 
 
@@ -377,7 +380,7 @@ def add_project(request):
         form = ProjectForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Project added successfully.")
+            #messages.success(request, "Project added successfully.")
             return redirect("core:project_list")
     else:
         form = ProjectForm()
@@ -392,7 +395,7 @@ def edit_project(request, project_id):
         form = ProjectForm(request.POST, instance=project)
         if form.is_valid():
             form.save()
-            messages.success(request, "Project updated successfully.")
+            #messages.success(request, "Project updated successfully.")
             return redirect("core:project_list")
     else:
         form = ProjectForm(instance=project)
@@ -413,7 +416,7 @@ def delete_project(request, project_id):
         if is_ajax:
             return JsonResponse({"success": True, "message": f"Project '{project_name}' deleted."})
 
-        messages.success(request, "Project deleted.")
+        #messages.success(request, "Project deleted.")
         return redirect("core:project_list")
     return redirect("core:project_list")
 
@@ -435,7 +438,7 @@ def assign_user_to_project(request, user_id):
         if project_id:
             project = get_object_or_404(Project, id=project_id)
             Assignment.objects.get_or_create(user=user, project=project)
-            messages.success(request, f"{user.username} assigned to {project.name}.")
+            #messages.success(request, f"{user.username} assigned to {project.name}.")
             return redirect("core:admin_manage_users")
 
     # Get all projects with search capability
@@ -461,8 +464,14 @@ def assign_user_to_project(request, user_id):
 def delete_user(request, user_id):
     user = get_object_or_404(User, id=user_id)
     if request.method == "POST":
+        username = user.username
         user.delete()
-        messages.success(request, "User deleted successfully.")
+
+        # Check for AJAX request
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        if is_ajax:
+            return JsonResponse({"success": True, "message": f"User '{username}' deleted successfully."})
+
     return redirect("core:admin_manage_users")
 
 
@@ -475,7 +484,7 @@ def mentor_project(request, project_id):
 
     # Add the current user as a mentor
     project.mentors.add(request.user)
-    messages.success(request, f"You are now mentoring {project.name}.")
+    #messages.success(request, f"You are now mentoring {project.name}.")
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({"success": True, "message": "You are now mentoring this project"})
@@ -491,7 +500,7 @@ def unmentor_project(request, project_id):
 
     # Remove the current user as a mentor
     project.mentors.remove(request.user)
-    messages.success(request, f"You are no longer mentoring {project.name}.")
+    #messages.success(request, f"You are no longer mentoring {project.name}.")
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({"success": True, "message": "You are no longer mentoring this project"})
@@ -516,9 +525,17 @@ def change_user_role(request, user_id):
         user.is_staff = False
         user.is_superuser = False
     else:
-        messages.error(request, "Invalid role")
+        # Check for AJAX request
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        if is_ajax:
+            return JsonResponse({"success": False, "message": "Invalid role"}, status=400)
         return redirect("core:admin_manage_users")
 
     user.save()
-    messages.success(request, f"Role changed for {user.username} to {new_role}")
+
+    # Check for AJAX request
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    if is_ajax:
+        return JsonResponse({"success": True, "message": f"Role changed for {user.username} to {new_role}"})
+
     return redirect("core:admin_manage_users")

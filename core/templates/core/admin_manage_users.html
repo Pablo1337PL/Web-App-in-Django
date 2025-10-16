@@ -43,15 +43,12 @@
       </td>
       <td>
         {% if user.is_superuser and user_profile.user.id != user.id %}
-          <form method="post" action="{% url 'core:change_user_role' user_profile.user.id %}" class="d-inline">
-            {% csrf_token %}
-            <select name="role" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
-              <option value="">Change Role...</option>
-              <option value="user" {% if not user_profile.user.is_staff %}selected{% endif %}>User</option>
-              <option value="staff" {% if user_profile.user.is_staff and not user_profile.user.is_superuser %}selected{% endif %}>Staff</option>
-              <option value="admin" {% if user_profile.user.is_superuser %}selected{% endif %}>Admin</option>
-            </select>
-          </form>
+          <select name="role" class="form-select form-select-sm d-inline-block w-auto change-role-select" data-user-id="{{ user_profile.user.id }}">
+            <option value="">Change Role...</option>
+            <option value="user" {% if not user_profile.user.is_staff %}selected{% endif %}>User</option>
+            <option value="staff" {% if user_profile.user.is_staff and not user_profile.user.is_superuser %}selected{% endif %}>Staff</option>
+            <option value="admin" {% if user_profile.user.is_superuser %}selected{% endif %}>Admin</option>
+          </select>
         {% endif %}
 
         {% if user.is_staff %}
@@ -59,10 +56,7 @@
         {% endif %}
 
         {% if user.is_superuser and not user_profile.user.is_superuser and user_profile.user.id != user.id %}
-          <form method="post" action="{% url 'core:delete_user' user_profile.user.id %}" class="d-inline">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-          </form>
+          <button class="btn btn-sm btn-danger delete-user-btn" data-user-id="{{ user_profile.user.id }}">Delete</button>
         {% endif %}
       </td>
     </tr>
@@ -87,6 +81,68 @@ document.addEventListener('DOMContentLoaded', function() {
                 row.style.display = '';
             } else {
                 row.style.display = 'none';
+            }
+        });
+    });
+
+    // Handle role change via AJAX
+    document.querySelectorAll('.change-role-select').forEach(select => {
+        select.addEventListener('change', async function() {
+            const userId = this.dataset.userId;
+            const newRole = this.value;
+
+            if (!newRole) return; // Do nothing if "Change Role..." is selected
+
+            try {
+                const response = await fetch(`/admin/users/change-role/${userId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken,
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `role=${encodeURIComponent(newRole)}`
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    // Reload the page to reflect the role change in the badge
+                    location.reload();
+                } else {
+                    alert(result.message || 'Failed to change role');
+                }
+            } catch (error) {
+                console.error('Error changing role:', error);
+                alert('Failed to change role');
+            }
+        });
+    });
+
+    // Handle delete user via AJAX
+    document.querySelectorAll('.delete-user-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const userId = this.dataset.userId;
+            const row = this.closest('tr');
+
+            try {
+                const response = await fetch(`/admin/users/delete/${userId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken,
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    // Remove the row from the table
+                    row.remove();
+                } else {
+                    alert(result.message || 'Failed to delete user');
+                }
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                alert('Failed to delete user');
             }
         });
     });

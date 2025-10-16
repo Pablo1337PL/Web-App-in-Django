@@ -87,7 +87,7 @@ function renderProjects(projects) {
 
         if (p.is_admin) {
             actionsHTML += `
-                <a href="/staff/projects/edit/${p.id}/" class="btn btn-sm btn-warning">Edit</a>
+                <a href="/admin/projects/edit/${p.id}/" class="btn btn-sm btn-warning">Edit</a>
                 <button class="btn btn-sm btn-danger delete-project-btn" data-id="${p.id}">Delete</button>
             `;
         }
@@ -265,7 +265,7 @@ function renderProjects(projects) {
     document.querySelectorAll('.delete-project-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
             const projectId = btn.dataset.id;
-            const deleteResp = await fetch(`/staff/projects/delete/${projectId}/`, {
+            const deleteResp = await fetch(`/admin/projects/delete/${projectId}/`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': csrftoken,

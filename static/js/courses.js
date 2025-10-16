@@ -81,10 +81,7 @@ function renderCourses(courses) {
         if (c.is_staff) {
             actionsHTML = `
                 <a href="/staff/courses/edit/${c.id}/" class="btn btn-sm btn-warning">Edit</a>
-                <form action="/staff/courses/delete/${c.id}/" method="post" style="display:inline;">
-                    <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}">
-                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                </form>
+                <button class="btn btn-sm btn-danger delete-course-btn" data-id="${c.id}">Delete</button>
             `;
         }
 
@@ -96,6 +93,27 @@ function renderCourses(courses) {
             <td>${actionsHTML}</td>
         `;
         tbody.appendChild(tr);
+    });
+
+    // Add event listeners to delete course buttons (staff only)
+    document.querySelectorAll('.delete-course-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const courseId = btn.dataset.id;
+            const deleteResp = await fetch(`/staff/courses/delete/${courseId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+
+            const result = await deleteResp.json();
+            if (result.success) {
+                fetchCourses();
+            } else {
+                alert(result.message || 'Failed to delete course');
+            }
+        });
     });
 }
 
